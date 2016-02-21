@@ -1,0 +1,13 @@
+build-*/
+xtensa-lx106-elf
+bin/mkspiffs
+bin/esptool2
+example/AdvancedWebServer/build.oak/
+node_modules
+download
+oak
+0*
+gitignore
+
+
+
