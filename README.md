@@ -1,3 +1,5 @@
+# WORK IN PROGRESS
+
 # Oak-Arduino-Makefile
 Makefile to build arduino code for Oak board under linux (tested on debian X64).
 
