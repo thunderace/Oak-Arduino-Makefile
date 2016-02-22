@@ -8,12 +8,12 @@ ARDUINO_ARCH = oak
 ARDUINO_BOARD ?= ESP8266_OAK
 ARDUINO_VARIANT ?= oak
 ARDUINO_VERSION ?= 10605
-#ESPTOOL_VERBOSE ?= -vv
 
 BOARDS_TXT  = $(ARDUINO_HOME)/boards.txt
 PARSE_BOARD = $(ROOT_DIR)/bin/ard-parse-boards
 PARSE_BOARD_OPTS = --boards_txt=$(BOARDS_TXT)
 PARSE_BOARD_CMD = $(PARSE_BOARD) $(PARSE_BOARD_OPTS)
+NODE_CMD = node
 
 VARIANT = $(shell $(PARSE_BOARD_CMD) $(ARDUINO_VARIANT) build.variant)
 MCU   = $(shell $(PARSE_BOARD_CMD) $(ARDUINO_VARIANT) build.mcu)
@@ -32,6 +32,8 @@ XTENSA_TOOLCHAIN ?= $(ROOT_DIR)/xtensa-lx106-elf/bin/
 ESPRESSIF_SDK = $(ARDUINO_HOME)/tools/sdk
 ESPTOOL ?= $(ROOT_DIR)/bin/esptool2
 ESPOTA ?= $(ARDUINO_HOME)/tools/espota.py
+OAK_CLI ?= $(ROOT_DIR)/bin/OakCLI/oak.js
+OAK_CLI_CMD ?= $(NODE_CMD) $(ROOT_DIR)/bin/OakCLI/oak.js
 
 BUILD_OUT = ./build.$(ARDUINO_VARIANT)
 
@@ -198,9 +200,6 @@ $(BUILD_OUT)/$(TARGET).elf: core libs
 size : $(BUILD_OUT)/$(TARGET).elf
 		$(SIZE) -A $(BUILD_OUT)/$(TARGET).elf | grep -E '^(?:\.text|\.data|\.rodata|\.irom0\.text|)\s+([0-9]+).*'
 
-#-quiet -bin -boot2 -4096 -iromchksum "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin" .text .data .rodata
-#	$(ESPTOOL) -eo $(ARDUINO_HOME)/bootloaders/eboot/eboot.elf -bo $(BUILD_OUT)/$(TARGET).bin \
-
 
 $(BUILD_OUT)/$(TARGET).bin: $(BUILD_OUT)/$(TARGET).elf
 	$(ESPTOOL) -quiet -bin -boot2 -4096 -iromchksum \
@@ -208,11 +207,8 @@ $(BUILD_OUT)/$(TARGET).bin: $(BUILD_OUT)/$(TARGET).elf
 		$(BUILD_OUT)/$(TARGET).bin \
 		.text .data .rodata
 
-upload: $(BUILD_OUT)/$(TARGET).bin size
-	$(ESPTOOL) $(ESPTOOL_VERBOSE) -cd $(UPLOAD_RESETMETHOD) -cb $(UPLOAD_SPEED) -cp $(SERIAL_PORT) -ca 0x00000 -cf $(BUILD_OUT)/$(TARGET).bin
-
-ota: $(BUILD_OUT)/$(TARGET).bin
-	$(ESPOTA) 192.168.1.184 8266 $(BUILD_OUT)/$(TARGET).bin
+upload: $(BUILD_OUT)/$(TARGET).bin
+	$(OAK_CLI_CMD) $(BUILD_OUT)/$(TARGET).bin
 
 term:
 	minicom -D $(SERIAL_PORT) -b $(UPLOAD_SPEED)

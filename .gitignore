@@ -2,8 +2,9 @@ build-*/
 xtensa-lx106-elf
 bin/mkspiffs
 bin/esptool2
-example/AdvancedWebServer/build.oak/
+example/start/build.oak/
 node_modules
+bin/OakCLI
 download
 oak
 0*
