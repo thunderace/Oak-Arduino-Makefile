@@ -28,9 +28,7 @@ chmod +x bin/oak
 
 # Get oakcli from git (with bug fixes)
 git clone https://github.com/thunderace/OakCLI.git bin/OakCLI
-cd bin/OakCLI & npm install
-rm -f bin/oak.js
-
+cd bin/OakCLI && npm install
 
 
 # Get Arduino core for Oak

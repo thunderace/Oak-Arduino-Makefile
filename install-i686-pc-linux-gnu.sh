@@ -27,7 +27,7 @@ chmod +x bin/oak
 
 # Get oakcli from git (with bug fixes)
 git clone https://github.com/thunderace/OakCLI.git bin/OakCLI
-cd bin/OakCLI & npm install
+cd bin/OakCLI && npm install
 
 # Get Arduino core for ESP8266 chip
 wget --no-clobber https://github.com/digistump/OakCore/releases/download/$OAKCORE_VER/core-$OAKCORE_VER.zip -P $DOWNLOAD_CACHE
