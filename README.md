@@ -19,7 +19,7 @@ TODO : upload and extensive tests
 ##dependencies
 - this project install the lastest stable  oak_core and the last esptool2 and xtensa-lx106 toolchain
 - you need nodejs installed
-- 
+ 
 ##before upload
 You have to run this once : node bin/OakCLI/oak.js in order to configure youe particle access
 
