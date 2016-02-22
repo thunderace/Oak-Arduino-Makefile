@@ -26,6 +26,7 @@ tar xvfv $DOWNLOAD_CACHE/oakcli-$OAKCLI_VER-linux32.tar.gz --strip=1 -C ./bin
 chmod +x bin/oak
 
 # Get oakcli from git (with bug fixes)
+rm -fr bin/OakCLI
 git clone https://github.com/thunderace/OakCLI.git bin/OakCLI
 cd bin/OakCLI && npm install
 
