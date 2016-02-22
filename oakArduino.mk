@@ -113,21 +113,21 @@ CORE_INC = $(ARDUINO_HOME)/cores/$(ARDUINO_ARCH) \
 CORE_INC += $(ARDUINO_HOME)/cores/$(ARDUINO_ARCH)/spiffs
 CORE_INC += $(ARDUINO_HOME)/cores/$(ARDUINO_ARCH)/OakParticle
 CORE_INC += $(ARDUINO_HOME)/cores/$(ARDUINO_ARCH)/ESP8266WiFi/src
-#CORE_INC += $(ARDUINO_HOME)/cores/$(ARDUINO_ARCH)/ESP8266WiFi/src/include
 
 INCLUDES = $(CORE_INC:%=-I%) $(ALIBDIRS:%=-I%) $(ULIBDIRS:%=-I%)
 VPATH = . $(CORE_INC) $(ALIBDIRS) $(ULIBDIRS)
 
 ASFLAGS = -c -g -x assembler-with-cpp -MMD $(DEFINES)
 
-CFLAGS = -c -Os -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL \
+CFLAGS = -c -O2 -g -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL \
 	-fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals \
 	-falign-functions=4 -MMD -std=gnu99 -ffunction-sections -fdata-sections
 
-CXXFLAGS = -c -Os -mlongcalls -mtext-section-literals -fno-exceptions \
-	-fno-rtti -falign-functions=4 -std=c++11 -MMD
+CXXFLAGS = -c -O2 -g -mlongcalls -mtext-section-literals -fno-exceptions \
+	-fno-rtti -falign-functions=4 -std=c++11 -MMD -ffunction-sections -fdata-sections
 
-LDFLAGS = -nostdlib -Wl,--gc-sections -Wl,--no-check-sections -u call_user_start -Wl,-static -Wl,-wrap,system_restart_local -Wl,-wrap,register_chipv6_phy
+LDFLAGS = -g -O2 -nostdlib -Wl,--no-check-sections -u call_user_start -u Cache_Read_Enable_New -Wl,-static -L$(ESPRESSIF_SDK)/lib -L$(ESPRESSIF_SDK)/ld -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,register_chipv6_phy
+#LDFLAGS = -nostdlib -Wl,--gc-sections -Wl,--no-check-sections -u call_user_start -Wl,-static -Wl,-wrap,system_restart_local -Wl,-wrap,register_chipv6_phy
 
 CC := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-gcc
 CXX := $(XTENSA_TOOLCHAIN)xtensa-lx106-elf-g++
@@ -139,7 +139,7 @@ CAT	= cat
 
 .PHONY: all arduino dirs clean upload
 
-all: show_variables dirs core libs bin size
+all: show_variables dirs core libs bin
 
 show_variables:
 	$(info [ARDUINO_LIBS] : $(ARDUINO_LIBS))
@@ -188,17 +188,33 @@ $(BUILD_OUT)/%.ino.o: %.ino
 $(BUILD_OUT)/%.cpp.o: %.cpp
 	$(CXX) $(DEFINES) $(CXXFLAGS) $(INCLUDES) $< -o $@
 
-# ultimately, use our own ld scripts ...
+#$(BUILD_OUT)/$(TARGET).elf: core libs
+#	$(LD) $(LDFLAGS) -L$(ESPRESSIF_SDK)/lib \
+#		-L$(ESPRESSIF_SDK)/ld -T$(ESPRESSIF_SDK)/ld/eagle.flash.4m.ld \
+#		-o $@ -Wl,--start-group $(OBJ_FILES) $(BUILD_OUT)/core/core.a \
+#		-lm -lgcc -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp -lsmartconfig \
+#		-lwps -lcrypto \
+#		-Wl,--end-group -L$(BUILD_OUT)
+
+
+#recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} 
+# -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{build.path}/arduino.ar" {compiler.c.elf.libs} 
+# -Wl,--end-group  "-L{build.path}"
+
+#elf.libs = -lm -lgcc -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp -lsmartconfig -lwps -lcrypto -laxtls
+#elf.flags = -g -O2 -nostdlib -Wl,--no-check-sections -u call_user_start -u Cache_Read_Enable_New -Wl,-static "-L{compiler.sdk.path}/lib" "-L{compiler.sdk.path}/ld" "-T{build.flash_ld}" -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,register_chipv6_phy
+#elf.extra_flags=
+#LDFLAGS = -nostdlib -Wl,--gc-sections -Wl,--no-check-sections -u call_user_start -Wl,-static -Wl,-wrap,system_restart_local -Wl,-wrap,register_chipv6_phy
+#LDFLAGS = -g -O2 -nostdlib -Wl,--no-check-sections -u call_user_start -u Cache_Read_Enable_New -Wl,-static -L$(ESPRESSIF_SDK)/lib -L$(ESPRESSIF_SDK)/ld -Wl,--gc-sections -Wl,-wrap,system_restart_local -Wl,-wrap,register_chipv6_phy
+
+
 $(BUILD_OUT)/$(TARGET).elf: core libs
-	$(LD) $(LDFLAGS) -L$(ESPRESSIF_SDK)/lib \
-		-L$(ESPRESSIF_SDK)/ld -T$(ESPRESSIF_SDK)/ld/eagle.flash.4m.ld \
+	$(LD) $(LDFLAGS) -T$(ESPRESSIF_SDK)/ld/oak_full.ld \
 		-o $@ -Wl,--start-group $(OBJ_FILES) $(BUILD_OUT)/core/core.a \
 		-lm -lgcc -lhal -lphy -lnet80211 -llwip -lwpa -lmain -lpp -lsmartconfig \
-		-lwps -lcrypto \
+		-lwps -lcrypto -laxtls \
 		-Wl,--end-group -L$(BUILD_OUT)
 
-size : $(BUILD_OUT)/$(TARGET).elf
-		$(SIZE) -A $(BUILD_OUT)/$(TARGET).elf | grep -E '^(?:\.text|\.data|\.rodata|\.irom0\.text|)\s+([0-9]+).*'
 
 
 $(BUILD_OUT)/$(TARGET).bin: $(BUILD_OUT)/$(TARGET).elf
