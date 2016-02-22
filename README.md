@@ -13,12 +13,16 @@ TODO : upload and extensive tests
 - In your sketch directory place a Makefile that defines anything that is project specific and put this line at the end `include /path_to_Oak-Arduino-Makefile_directory/oakArduino.mk` (see example)
 - `make upload` should build your sketch and upload it...
 
-#tests
+##tests
 - `cd Oak-Arduino-Makefile/example/start && make upload`
 
-#dependencies
+##dependencies
 - this project install the lastest stable  oak_core and the last esptool2 and xtensa-lx106 toolchain
 - you need nodejs installed
+- 
+##before upload
+You have to run this once : node bin/OakCLI/oak.js in order to configure youe particle access
+
 
 
 
