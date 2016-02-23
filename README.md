@@ -1,4 +1,3 @@
-# WORK IN PROGRESS
 
 # Oak-Arduino-Makefile
 Makefile to build arduino code for Oak board under linux (tested on debian X64).
@@ -18,6 +17,7 @@ TODO : upload and extensive tests
 
 ##dependencies
 - this project install the lastest stable  oak_core and the last esptool2 and xtensa-lx106 toolchain
+- the fork git oak-cli is used because the release version has a bug not corrected
 - you need nodejs installed
  
 ##before upload
