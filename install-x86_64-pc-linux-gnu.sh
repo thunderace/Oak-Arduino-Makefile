@@ -1,5 +1,5 @@
-declare OAKCORE_VER=0.9.3
-declare OAKCLI_VER=0.9.4
+declare OAKCORE_VER=0.9.5
+declare OAKCLI_VER=0.9.5
 declare MKSPIFFS_VER=0.1.2
 declare ESPTOOL2_VER=0.9.1
 
