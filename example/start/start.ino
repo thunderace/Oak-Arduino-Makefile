@@ -10,9 +10,9 @@ void setup() {
 
 // the loop routine runs over and over again forever:
 void loop() {
-  digitalWrite(1, HIGH);   // turn the LED on (HIGH is the voltage level)
-  temperature += 2;
-  delay(1000);               // wait for a second
-  digitalWrite(1, LOW);    // turn the LED off by making the voltage LOW
+  if (temperature > 250) {
+    temperature = 0;
+  }
+  temperature += 1;
   delay(1000);  
 }

@@ -6,7 +6,7 @@ SERIAL_PORT ?= /dev/tty.oak
 ARDUINO_HOME ?=  $(ROOT_DIR)/OakCore
 ARDUINO_ARCH = oak
 ARDUINO_BOARD ?= ESP8266_OAK
-ARDUINO_VARIANT ?= oak
+ARDUINO_VARIANT ?= oak1
 ARDUINO_VERSION ?= 10605
 
 BOARDS_TXT  = $(ARDUINO_HOME)/boards.txt
@@ -32,8 +32,11 @@ XTENSA_TOOLCHAIN ?= $(ROOT_DIR)/xtensa-lx106-elf/bin/
 ESPRESSIF_SDK = $(ARDUINO_HOME)/tools/sdk
 ESPTOOL ?= $(ROOT_DIR)/bin/esptool2
 ESPOTA ?= $(ARDUINO_HOME)/tools/espota.py
-OAK_CLI ?= $(ROOT_DIR)/bin/OakCLI/oak.js
+OAK_CLI ?= $(ROOT_DIR)/bin/oak
 OAK_CLI_CMD ?= $(NODE_CMD) $(ROOT_DIR)/bin/OakCLI/oak.js
+#ifdef DEVICE_NAME
+OAK_CLI_ARGS=-d $(DEVICE_NAME)
+#endif
 
 BUILD_OUT = ./build.$(ARDUINO_VARIANT)
 
@@ -224,7 +227,8 @@ $(BUILD_OUT)/$(TARGET).bin: $(BUILD_OUT)/$(TARGET).elf
 		.text .data .rodata
 
 upload: $(BUILD_OUT)/$(TARGET).bin
-	$(OAK_CLI_CMD) $(BUILD_OUT)/$(TARGET).bin
+	$(OAK_CLI) $(BUILD_OUT)/$(TARGET).bin
+	#	$(OAK_CLI) $(OAK_CLI_ARGS) $(BUILD_OUT)/$(TARGET).bin
 
 term:
 	minicom -D $(SERIAL_PORT) -b $(UPLOAD_SPEED)
